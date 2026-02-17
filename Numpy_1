@@ -1,0 +1,17 @@
+import geopandas as gd
+from geodatasets import get_path
+import matplotlib.pyplot as plt
+mypath=get_path("nybb")
+gdf=gd.read_file(get_path("nybb"))
+print(gdf)
+gdf.set_index=("BoroName")
+gdf["geoArea"]=gdf.area
+gdf["centroid"]=gdf.centroid
+gdf["Boundary"]=gdf.boundary
+gdf=gdf.set_geometry("Boundary")
+gdf.plot(column="geoArea")
+plt.show()
+print(gdf)
+print("Curent crs:",gdf.crs)
+gdf.to_crs(crs="EPSG:4326",inplace=True)
+print("After reprojection:",gdf.crs)
