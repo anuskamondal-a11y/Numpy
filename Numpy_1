@@ -1,17 +1,66 @@
-import geopandas as gd
-from geodatasets import get_path
+#importing the required packages and libraries
+!pip install imagecodecs
+import tifffile as t
+import numpy as np
 import matplotlib.pyplot as plt
-mypath=get_path("nybb")
-gdf=gd.read_file(get_path("nybb"))
-print(gdf)
-gdf.set_index=("BoroName")
-gdf["geoArea"]=gdf.area
-gdf["centroid"]=gdf.centroid
-gdf["Boundary"]=gdf.boundary
-gdf=gdf.set_geometry("Boundary")
-gdf.plot(column="geoArea")
+from matplotlib.colors import LinearSegmentedColormap
+
+#reading the TIFF files
+Green=t.imread("/content/drive/MyDrive/GEE_GeoAI/Green_B3_Jan2026.tif")
+Red = t.imread("/content/drive/MyDrive/GEE_GeoAI/Red_B4_Jan2026.tif")
+NIR = t.imread("/content/drive/MyDrive/GEE_GeoAI/NIR_B8_Jan2026.tif")
+SWIR= t.imread("/content/drive/MyDrive/GEE_GeoAI/SWIR1_B11_Jan2026.tif")
+#checking the shapes
+# print("Green band shape:", Green.shape)
+# print("Red band shape:", Red.shape)
+# print("NIR band shape:", NIR.shape)
+# print("NIR band shape:", SWIR.shape)
+
+#converting the data type from unsigned integer to float 32 data type for more precise calculation
+Green=Green.astype("float32")
+Red=Red.astype("float32")
+NIR=NIR.astype("float32")
+SWIR=SWIR.astype("float32")
+# plt.imshow(Red)
+# plt.imshow(NIR)
+# plt.imshow(NIR)
+
+#calculating the indices (NDVI, NDWI, NDBI)
+NDVI=((NIR-Red)/(NIR+Red))
+NDWI=((Green-NIR)/(Green+NIR))
+NDBI=((SWIR-NIR)/(SWIR+NIR))
+
+# #plotting the maps
+# # #1. NDVI
+plt.figure(figsize=(4,4))
+plt.title("NDVI of North 24 Parganas, West Bengal\nJanuary 2026")
+plt.imshow(NDVI, cmap='viridis')
+plt.colorbar()
+plt.axis('on')
 plt.show()
-print(gdf)
-print("Curent crs:",gdf.crs)
-gdf.to_crs(crs="EPSG:4326",inplace=True)
-print("After reprojection:",gdf.crs)
+
+
+#2. NDWI
+plt.figure(figsize=(4,4))
+plt.title("NDWI of North 24 Parganas, West Bengal\nJanuary 2026")
+plt.imshow(NDWI, cmap='Blues', vmin=0, vmax=0.24)
+plt.colorbar(label="NDWI")
+plt.axis('on')
+plt.show()
+
+#3. NDBI
+plt.figure(figsize=(4,4))
+plt.title("NDBI of North 24 Parganas, West Bengal\nJanuary 2026")
+plt.imshow(NDBI, cmap='RdYlBu_r', vmin=-0.2, vmax=0.2)
+plt.colorbar(label="NDBI")
+plt.axis('on')
+plt.show()
+
+# Writing outputs to TIFF files
+t.imwrite("/content/drive/MyDrive/GEE_GeoAI/NDVI_Jan2026.tif",
+          NDVI.astype("float32"))
+t.imwrite("/content/drive/MyDrive/GEE_GeoAI/NDWI_Jan2026.tif",
+          NDWI.astype("float32"))
+t.imwrite("/content/drive/MyDrive/GEE_GeoAI/NDBI_Jan2026.tif",
+          NDBI.astype("float32"))
+print("NDVI, NDWI and NDBI TIFF files successfully saved.")
