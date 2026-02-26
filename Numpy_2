@@ -1,0 +1,34 @@
+#Iporting the required libraries 
+!pip install imagecodecs
+import tifffile as t
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Loading two tiles of the Band 4 (Landsat 8) 
+Tile_1 = t.imread(r"C:\Users\Projects\GeoAI_1\Band_4_Clip1.TIF")
+Tile_2 = t.imread(r"C:\Users\Projects\GeoAI_1\Band_4_Clip0.TIF")
+
+#Displaying the individual tiles
+#Tile 1
+plt.figure(figsize=(4,4))
+plt.imshow(Tile_1, cmap='gray')
+plt.title("Tile 1 - Band 4")
+plt.axis('off')
+plt.show()
+
+#Tile 1
+plt.figure(figsize=(4,4))
+plt.imshow(Tile_2, cmap='gray')
+plt.title("Tile 2 - Band 4")
+plt.axis('off')
+plt.show()
+
+# vertically stacking the tiles
+stacked = np.vstack((Tile_1, Tile_2))
+
+# Plotting the stacked tiles
+plt.figure(figsize=(4,4))
+plt.imshow(stacked, cmap='viridis')
+plt.title("Tripura, January 2026\nVertically stacked Band 4 tile")
+plt.axis('on')
+plt.show()
